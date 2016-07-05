@@ -1,0 +1,38 @@
+---
+title: "Exploring the DREAM dataset"
+author: "Ted Laderas"
+date: "July 5, 2016"
+output: html_document
+---
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+require(synapseClient)
+synapseLogin(username = "laderast", password="synsyn12")
+
+clinicalData <- synGet("syn6043449")
+clinicalDF <- read.delim(clinicalData@filePath, header=T)
+
+write.table(clinicalDF, "data/ViralChallenge_training_CLINICAL.tsv", sep="\t", row.names=FALSE)
+
+granularSymptoms <- synGet("syn6043450")
+granularSymptomsDF <- read.delim(granularSymptoms@filePath, header=T)
+
+write.table(granularSymptomsDF, "data/ViralChallenge_training_SymptomScoresByDay.tsv", quote=F, sep = "\t", row.names=FALSE)
+
+expressionNorm <- synGet("syn6043448")
+expressionNorm <- read.delim(expressionNorm@filePath, header=T)
+
+write.table(expressionNorm, "data/ViralChallenge_training_EXPRESSION_RMA.tsv", quote=F, sep="\t")
+```
+
+You can also embed plots, for example:
+
+```{r, echo=FALSE}
+plot(cars)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
