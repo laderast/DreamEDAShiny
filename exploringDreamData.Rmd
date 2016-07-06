@@ -11,7 +11,11 @@ When you click the **Knit** button a document will be generated that includes bo
 
 ```{r}
 require(synapseClient)
+<<<<<<< HEAD
 synapseLogin(username = "laderast", password="synsyn12")
+=======
+synapseLogin(username = "laderast")
+>>>>>>> 2bd6deca3cdf5794f6a5556763e7be8d79946789
 
 clinicalData <- synGet("syn6043449")
 clinicalDF <- read.delim(clinicalData@filePath, header=T)
@@ -24,9 +28,12 @@ granularSymptomsDF <- read.delim(granularSymptoms@filePath, header=T)
 write.table(granularSymptomsDF, "data/ViralChallenge_training_SymptomScoresByDay.tsv", quote=F, sep = "\t", row.names=FALSE)
 
 expressionNorm <- synGet("syn6043448")
+<<<<<<< HEAD
 expressionNorm <- read.delim(expressionNorm@filePath, header=T)
 
 write.table(expressionNorm, "data/ViralChallenge_training_EXPRESSION_RMA.tsv", quote=F, sep="\t")
+=======
+>>>>>>> 2bd6deca3cdf5794f6a5556763e7be8d79946789
 ```
 
 You can also embed plots, for example:
