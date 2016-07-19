@@ -1,5 +1,8 @@
 # Open Data File
-data <- read.table("data/ViralChallenge_ExpressionRMA_early_timepoints.tsv")
+library(data.table)
+
+
+data <- read.table("data/ViralChallenge_ExpressionRMA_early_timepoints.tsv", header = TRUE)
 
 # Calculate variance for each probe
 var.by.row <- apply(data, MARGIN=1, FUN=var)
