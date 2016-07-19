@@ -7,24 +7,28 @@
 
 library(shiny)
 
-shinyUI(fluidPage(
-
-  # Application title
-  titlePanel("Old Faithful Geyser Data"),
-
-  # Sidebar with a slider input for number of bins
-  sidebarLayout(
-    sidebarPanel(
-      sliderInput("bins",
-                  "Number of bins:",
-                  min = 1,
-                  max = 50,
-                  value = 30)
+shinyUI(
+  navbarPage(
+    
+    # Application title
+    "Viral Data Explorer",
+    
+    tabPanel("Summary",
+             plotOutput("boxPlot"),
+             verbatimTextOutput("dataSummary")
     ),
-
-    # Show a plot of the generated distribution
-    mainPanel(
-      plotOutput("distPlot")
-    )
+    
+    # Sidebar with a slider input for number of bins
+    tabPanel("Gene Explorer",
+             selectInput("geneToFilter",label = "Select Gene To Filter By",
+                         choices = genes,selected=genes[1]),
+             plotOutput("genePlot")
+    ),
+    
+    tabPanel("Pathway Explorer",
+             selectInput("pathwayToFilter", label="Select Pathway to Display", 
+                         choices = names(pathways), selected=names(pathways)[1]),
+             plotOutput("pathwayPlot")
   )
-))
+)
+)
