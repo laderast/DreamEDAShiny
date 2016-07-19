@@ -1,6 +1,11 @@
 library(data.table)
 library(dplyr)
 
+library(hgu133plus2.db)
+x = unlist(as.list(hgu133plus2SYMBOL))
+geneTable <- data.table(probeID = names(x), geneSymbol = x)
+setkey(geneTable, probeID)
+
 expression <- fread("data/ViralChallenge_training_EXPRESSION_RMA.tsv",sep = "\t",header = T)
 clinicalDF <- read.delim("data/ViralChallenge_training_CLINICAL.tsv")
 
@@ -59,7 +64,7 @@ shamAnnotation <- data.table(shamAnnotation)
 setkey(shamAnnotation, CEL)
 
 #merge on sham annotation
-shamMelt2 <- shamMelt[shamAnnotation, .(FEATUREID, value, TIMEHOURS, STUDYID, SUBJECTID,SHEDDING_SC1, SYMPTOMATIC_SC2)]
+shamMelt2 <- shamMelt[shamAnnotation, .(FEATUREID, value, AGE, GENDER, TIMEHOURS, STUDYID, SUBJECTID,SHEDDING_SC1, SYMPTOMATIC_SC2)]
 setkey(shamMelt2, FEATUREID)
 
 shamMelt2 <- shamMelt2[geneTable]
@@ -73,12 +78,9 @@ setkey(rhinoMelt, variable)
 
 setkey(rhinoAnnotation, CEL)
 
-rhinoMelt2 <- rhinoMelt[rhinoAnnotation, .(FEATUREID, value, TIMEHOURS, STUDYID, SUBJECTID, SHEDDING_SC1, SYMPTOMATIC_SC2)]
+rhinoMelt2 <- rhinoMelt[rhinoAnnotation, .(FEATUREID, value, AGE, GENDER, TIMEHOURS, STUDYID, SUBJECTID, SHEDDING_SC1, SYMPTOMATIC_SC2)]
 
-library(hgu133plus2.db)
-x = unlist(as.list(hgu133plus2SYMBOL))
-geneTable <- data.table(probeID = names(x), geneSymbol = x)
-setkey(geneTable, probeID)
+
 
 
 setkey(rhinoMelt2, FEATUREID)
@@ -115,6 +117,8 @@ cvs[(cvRhino / cvSham) > 1.3]
 setkey(cvs, geneSymbol)
 setkey(rhinoMelt2, geneSymbol)
 
+colnames(cvs) <- c("geneSymbol", "cvSham", "cvRhino")
+
 out <- rhinoMelt2[cvs[abs(cvRhino / cvSham) > 1.4], mean(value), by="geneSymbol,TIMEHOURS"]
 
 ggplot(out, aes(x=factor(TIMEHOURS), y=factor(as.character(geneSymbol)), fill=V1)) + geom_raster()
@@ -128,7 +132,7 @@ DEEH1N1data <- fread("data/DEE3 H1N1/DEE3 H1N1-ViralChallenge_Expression_early_t
 DEEH1N1melt <- melt(DEEH1N1data, id.vars = "FEATUREID")
 setkey(DEEH1N1melt, variable)
 
-DEEH1N1melt <- DEEH1N1melt[DEEH1N1annot, .(FEATUREID, value, TIMEHOURS, STUDYID, SUBJECTID, SHEDDING_SC1, SYMPTOMATIC_SC2)]
+DEEH1N1melt <- DEEH1N1melt[DEEH1N1annot, .(FEATUREID, value, AGE, GENDER, TIMEHOURS, STUDYID, SUBJECTID, SHEDDING_SC1, SYMPTOMATIC_SC2)]
 setkey(DEEH1N1melt, FEATUREID)
 
 DEEH1N1melt <- DEEH1N1melt[geneTable]
@@ -144,7 +148,12 @@ shamSmall$STUDYID <- "SHAM"
 
 rhinoSmall <- rhinoMelt2[geneSymbol %in% geneSyms]
 
-save(H1N1small, shamSmall, rhinoSmall, file="data/twoStudies.RData")
+#save(H1N1small, shamSmall, rhinoSmall, file="data/twoStudies.RData")
+
+viralList <- list(shamSmall, rhinoSmall, H1N1small)
+viralData <- do.call(rbind, viralList)
+viralData <- na.omit(viralData)
+
 
 
 pathwaysFrame <- fread("/home/laderast/DreamEDAShiny/data/result.csv")
@@ -156,3 +165,7 @@ pathways <- lapply(pathwaysFrame$`Pathway name`, function(x){
 })
 
 names(pathways) <- pathwaysFrame$`Pathway name`
+
+averageProfiles <- viralData[,.(meanExpr=mean(value),sdExpr=sd(value)),by=list(TIMEHOURS, STUDYID, geneSymbol)]
+
+save(viralData, pathways, averageProfiles, file="data/twoStudies.RData")
