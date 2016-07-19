@@ -33,15 +33,11 @@ shinyServer(function(input, output) {
       pathwaySet <- pathways[[1]]
       pway <- names(pathways)[1]
     }else{
-    print(input$pathwayToFilter)
+    
     pway <- input$pathwayToFilter
     pathwaySet <- pathways[[pway]]
     }
-    
-    
-    print(pway)
-    print(pathwaySet)
-    
+
     test <- averageProfiles[geneSymbol %in% pathwaySet]
     
 #     ggplot(outData, 
