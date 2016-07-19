@@ -2,7 +2,11 @@ library(data.table)
 library(ggplot2)
 library(dplyr)
 
+<<<<<<< HEAD
 load("data/twoStudies.RData")
+=======
+load("/home/laderast/DreamEDAShiny/data/twoStudies.RData")
+>>>>>>> 9e43a5dc95ee6a6e3bedfda62ab9400bb9089b66
 
 setkey(viralData, TIMEHOURS)
 
