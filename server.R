@@ -14,7 +14,8 @@ shinyServer(function(input, output) {
     geneSelect <- input$geneToFilter
     
     ggplot(viralData[geneSymbol == geneSelect], aes(x=TIMEHOURS, y=value, 
-                                                    group=SUBJECTID, color=SUBJECTID)) + 
+                                                    group=interaction(SUBJECTID, FEATUREID), 
+                                                    color=interaction(SUBJECTID, FEATUREID))) + 
       geom_path() + facet_wrap(c("STUDYID")) + guides(colour=FALSE)
     
   })
@@ -46,7 +47,9 @@ shinyServer(function(input, output) {
 #       geom_path()  +  geom_errorbar(aes(ymin=meanExpr - sdExpr, ymax=meanExpr + sdExpr)) + 
 #       facet_wrap(c("STUDYID")) + ggtitle(pway) 
     
-    ggplot(test, aes(TIMEHOURS, meanExpr, group = geneSymbol, colour=geneSymbol)) + geom_path() + facet_wrap(c("STUDYID")) + geom_errorbar(aes(ymin=meanExpr-sdExpr, ymax=meanExpr+sdExpr))
+    ggplot(test, aes(TIMEHOURS, meanExpr, group = geneSymbol, colour=geneSymbol)) + 
+        geom_path() + facet_wrap(c("STUDYID")) + 
+        geom_errorbar(aes(ymin=meanExpr-sdExpr, ymax=meanExpr+sdExpr))
 
   })
   

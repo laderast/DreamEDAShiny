@@ -7,7 +7,7 @@ output: html_document
 
 The goal of today's workshop is to examine a set of genes across a number of cohorts for Dream Challenge Dataset.
 
-There are seven studies in total with the following characteristics. The most important is the Duke Rhinovirus dataset, which contained patients who were exposed to Rhinovirus 
+There are seven studies in total with the following characteristics. The most important is the Duke Rhinovirus dataset, which contained patients who were exposed to Rhinovirus (notated as `rhino`) and patients who were exposed to a control (annotated as `SHAM`). 
 
 ##Before You Start
 
@@ -20,19 +20,21 @@ library(dplyr)
 library(shiny)
 ```
 
+Clone the repo into a directory. If you are using the desktop client, you will need to go to the webpage for the repo and select ">>Clone or Download >> Open in Desktop":
+
+```{r eval = FALSE}
+git clone https://github.com/laderast/DreamEDAShiny
+```
+
 ##Filtering 
 
 The set of 20,000 probesets from the Affymetrix U133 2.0 microarray were mapped to the gene sets and filtered using the following approach. The Coefficients of Variation for the Sham (non exposed) patients at all timepoints were compared to the CVs for those patients exposed to Rhinovirus. The thought behind this is that genes of interest should show more variability (due to the time-series design) in the Rhinovirus patients than the sham patients.
 
-Based on visualizing the distributions of CVs, a cutoff of `cvRhinovirus/cvSham` > 1.4 was used, leading to a set of 836 genes that had higher variability in the Rhinovirus compared to Shams. We'll be visualizing this much smaller set across multiple patients, diseases, and time points.
-
-```{r}
-summary(cars)
-```
+Based on visualizing the distributions of CVs, a cutoff of `cvRhinovirus/cvSham` > 1.4 was used, leading to a set of 836 genes that had higher observed variability in the Rhinovirus compared to Shams. We'll be visualizing this much smaller set across multiple patients, diseases, and time points.
 
 ##Using `data.tables`
 
-
+All of the data is in the `/data/twoStudies.RData` object.
 
 
 ##Visualizing Gene Sets
