@@ -9,44 +9,40 @@ library(shiny)
 
 shinyServer(function(input, output) {
 
-  output$genePlot <- renderPlot({
-    
-    geneSelect <- input$geneToFilter
-    
-    ggplot(viralData[geneSymbol == geneSelect], aes(x=TIMEHOURS, y=value, 
-                                                    group=interaction(SUBJECTID, FEATUREID), 
-                                                    color=interaction(SUBJECTID, FEATUREID))) + 
-      geom_path() + facet_wrap(c("STUDYID")) + guides(colour=FALSE)
-    
-  })
-  
   output$dataSummary <- renderPrint({summary(viralData)})
+  
   
   output$boxPlot <- renderPlot({
     ggplot(viralData, aes(x=STUDYID, y=value)) + geom_boxplot() 
+  })
+
+  
+  output$genePlot <- renderPlot({
+    #get gene name from select box
+    geneSelect <- input$geneToFilter
     
+    #subset the data
+    subsetData <- viralData[geneSymbol == geneSelect]
+    
+    #plot the data
+    ggplot(subsetData, aes(x=TIMEHOURS, y=value, group=interaction(SUBJECTID, FEATUREID), 
+                           color=interaction(SUBJECTID, FEATUREID))) + 
+      geom_path() + facet_grid(.~STUDYID) + 
+      #remove the color legend
+      guides(colour=FALSE)
   })
   
+  
   output$pathwayPlot <- renderPlot({
-    
-    
-    if(is.null(input$pathwayToFilter)){
-      pathwaySet <- pathways[[1]]
-      pway <- names(pathways)[1]
-    }else{
-    
+    #get pathway from select box
     pway <- input$pathwayToFilter
+    #grab the pathway set associated with pathway
     pathwaySet <- pathways[[pway]]
-    }
-
+    
+    #subset the average profiles
     test <- averageProfiles[geneSymbol %in% pathwaySet]
     
-#     ggplot(outData, 
-#            aes(x=TIMEHOURS, y=meanExpr, 
-#            group=geneSymbol, colour=geneSymbol)) +
-#       geom_path()  +  geom_errorbar(aes(ymin=meanExpr - sdExpr, ymax=meanExpr + sdExpr)) + 
-#       facet_wrap(c("STUDYID")) + ggtitle(pway) 
-    
+    #plot the average profiles with error bars
     ggplot(test, aes(TIMEHOURS, meanExpr, group = geneSymbol, colour=geneSymbol)) + 
         geom_path() + facet_wrap(c("STUDYID")) + 
         geom_errorbar(aes(ymin=meanExpr-sdExpr, ymax=meanExpr+sdExpr))
