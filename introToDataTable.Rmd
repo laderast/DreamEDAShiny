@@ -46,7 +46,7 @@ Let's specify another table to join `irisDT` on. To do so, we'll initialize a br
 
 ```{r}
 #make a little table to merge
-#initializing a data.table is similar to initializing a data.frame
+#initializing a data.table is identical to initializing a data.frame
 testTable <- data.table(Species=c("setosa", "versicolor", "virginica"), 
                         Likes=c(TRUE,FALSE,FALSE), Color = c("purple", "purple", "pink"))
 #show the table
@@ -77,7 +77,6 @@ If we wanted the data in a `wide` matrix format with each row belonging to a pro
 
 The key to understanding `dcast` is understanding the formula interface for R.
 
-If we wanted 
 
 ```{r}
 load("data/twoStudies.RData")
