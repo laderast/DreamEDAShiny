@@ -27,9 +27,11 @@ shinyServer(function(input, output) {
     #plot the data
     ggplot(subsetData, aes(x=TIMEHOURS, y=value, group=interaction(SUBJECTID, FEATUREID), 
                            color=interaction(SUBJECTID, FEATUREID))) + 
-      geom_path() + facet_grid(.~STUDYID) + 
+      geom_path() + 
       #remove the color legend
-      guides(colour=FALSE)
+      guides(colour=FALSE) #+
+      #uncomment the line below and the "+" above to condition the plot.
+      #facet_grid(.~STUDYID) + 
   })
   
   
@@ -44,8 +46,10 @@ shinyServer(function(input, output) {
     
     #plot the average profiles with error bars
     ggplot(test, aes(TIMEHOURS, meanExpr, group = geneSymbol, colour=geneSymbol)) + 
-        geom_path() + facet_wrap(c("STUDYID")) + 
-        geom_errorbar(aes(ymin=meanExpr-sdExpr, ymax=meanExpr+sdExpr))
+        geom_path() +  
+        geom_errorbar(aes(ymin=meanExpr-sdExpr, ymax=meanExpr+sdExpr)) #+
+        #uncomment the line below and the "+" above to condition the plot
+        #facet_grid(.~STUDYID) 
 
   })
   
