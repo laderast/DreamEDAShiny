@@ -1,0 +1,116 @@
+---
+title: "Introduction to data.table"
+author: "Ted Laderas"
+date: "July 20, 2016"
+output: html_document
+---
+
+##6.0 (Optional) A Quick Introduction to the `data.table` package
+
+We are using the `data.tables` package to store the data in memory. There are many advantages of a `data.table` versus using the regular `data.frame`:
+
+1. Subsetting and doing aggregate calculations (such as you would use `tapply()` for) are very fast for large datasets. This is because `data.table` avoids many of the memory-copying problems of current base R functions.
+2. The `fread()` function to load in data in delimited files is very fast, much faster than the base function `read.table()`.
+3. Joining tables is very fast and efficient.
+
+The main disadvantage of `data.table` is that the syntax is different than for `data.frames` or `dplyr`. It is just different enough to drive you crazy. The basic syntax is as follows:
+
+```{r eval=FALSE}
+DT[i,j,by]
+```
+
+Where 
+- `i` is an operation/function on rows, to produce row filtering (also called an `i`-statement),
+- `j` is an operation/function on columns, to calculate values on columnn (also called a `j`-statement),
+- `by` is an optional argument that specifies a column to aggregate on.
+
+We'll slowly go over all of these operations.
+
+##6.1 Keys For `data.table`
+
+A `data.table` has a key, which you can set by using the `setkey()` function. This key is usually a column name, though you can also use multiple columns here. This key has two purposes: it provides an *index* to sort the `data.table`, and for joining with other tables, it provides the identifier to join on. Joins/merges with data.table are very quick.
+
+```{r}
+#make a data.table version of iris data
+data(iris)
+
+irisDT <- data.table(iris)
+
+setkey(irisDT, Sepal.Length)
+irisDT
+```
+
+##6.2 Merges/Joins of Two `data.tables`
+
+Let's specify another table to join `irisDT` on. To do so, we'll initialize a brand new `data.table` called `testTable`.
+
+```{r}
+#make a little table to merge
+#initializing a data.table is similar to initializing a data.frame
+testTable <- data.table(Species=c("setosa", "versicolor", "virginica"), 
+                        Likes=c(TRUE,FALSE,FALSE), Color = c("purple", "purple", "pink"))
+#show the table
+testTable
+```
+
+Now we need to set common keys for both tables to join them.
+
+```{r}
+setkey(irisDT, Species)
+irisDT
+
+setkey(testTable, Species)
+```
+
+Now that we have the keys set for both tables, we can join them together. In `data.table`, this is called a *rolling join*, and it is very fast, even for datasets with millions of rows. 
+
+```{r}
+#merge the two tables together using the keys we set (Species)
+irisDT[testTable]
+```
+
+You may notice that the syntax here is completely different than `data.frame`. The way to read the above merge is that we want to merge the rows of `irisDT` and `testTable` given the keys that we have specified for each table.
+
+###6.3 Casting the long data into wide data
+
+If we wanted the data in a `wide` matrix format with each row belonging to a probeset/patient/study triplet, and each column corresponding to the value of the time series, we can transform the data using `dcast`. This function lets us *reshape* the data into another format. 
+
+The key to understanding `dcast` is understanding the formula interface for R.
+
+If we wanted 
+
+```{r}
+load("data/twoStudies.RData")
+
+dcast(viralData, FEATUREID + SUBJECTID + STUDYID ~ TIMEHOURS, value.var= "value", fun.aggregate = mean)
+```
+
+##6.4 Subsetting Rows
+
+This operation is very fast, and is the main reason we're using `data.tables`. Let's look at the first entry in the `pathways` object.
+
+```{r}
+#get the name of the first list item
+pway <- names(pathways)[1]
+pway
+
+path1 <- pathways[[pway]]
+path1
+```
+
+##6.5 Subsetting Columns
+
+You can subset columns the more 
+
+
+##6.6 Running Operations on columns
+
+
+
+##6.6 Using `by` to `tapply`
+
+Much like the `tapply()` command can be run on `data.frames` to aggregate data, we can specify operations or functions on columns (which are called `j`-statements) and use the `by=` argument to specify the operation 
+
+##6.5 Calculating New Values on Columns
+
+One of the most powerful operations is of `data.table` is that you can operate on columns in place using the `:=` operator. 
