@@ -49,7 +49,7 @@ When you have cloned the repo, open the `DreamEDAShiny.Rproj` in RStudio (Use **
 
 #2.0 Examining the Rhinovirus Data
 
-In this section, we'll examine the subsetted data in order to understand its format and learn some more about the `data.tables` package, which we'll use to store the data in memory. In case you are interested, there are a number of sections 
+In this section, we'll examine the subsetted data in order to understand its format and learn some more about the `data.table` package, which we'll use to store the data in memory. In case you are interested in learning more, there is another document `introToDataTable.Rmd` that introduces you to the basics of `data.table`.
 
 ##2.1 Looking at the data objects
 
@@ -66,7 +66,7 @@ ls()
 
 Look at the `viralData` table. How big is the data set (how many rows)? Which column has the expression value? Take a look at the `dataDescription.pdf` in the main directory of the repo. What do the other columns correspond to? What are our outcome variables that we want to examine?
 
-Both the `viralData` and the `averageProfiles` are in the `data.table` format, which is a more sophisticated version of `data.frame`. The main advantage is that working with `data.table` is very fast and is optimized for working with very large datasets. The disadvantage is that the syntax is slightly different than `data.frames`.
+Both the `viralData` and the `averageProfiles` are in the `data.table` format, which is a more sophisticated version of `data.frame`. The main advantage is that working with `data.table` is very fast and is optimized for working with very large datasets (on the order of millions of rows). The main disadvantage is that the syntax is slightly different than `data.frames`.
 
 ```{r}
 viralData
@@ -81,7 +81,7 @@ averageProfiles
 
 How does the `averageProfiles` table differ from the `viralData` profile? What aspect of the data did we average over?
 
-The last object we have in the `RData` file is the `pathways` object. This is a list of pathways from the Reactome database that the 836 genes that we have selected are overrepresented in. 
+The last object we have in the `RData` file is the `pathways` object. This is a list of pathways from the Reactome database that the 836 genes that we have selected are overrepresented in. Note that this data object only includes genes in our set that map to our gene set of interest, not the entire pathway.
 
 ```{r}
 #show first 5 pathways
@@ -91,6 +91,8 @@ pathways[1:5]
 We can use `pathways` to subset the data. We'll use this when we start visualizing the data. Notice that we don't have to use `viralData$geneSymbol` when we subset, and we don't need to specify a comma.
 
 ```{r}
+#grab the first pathway - `Regulation of IFNA signaling`
+
 pathway <- pathways[[1]]
 pathway
 
@@ -156,7 +158,7 @@ We'll take a quick break when everyone is finished with task 3 and discuss the d
 
 #5.0 Modifying the code
 
-There are lots of directions that we can modify the code with. We can condition plots on outcomes. We can condition the plots on demographics.
+There are lots of directions that we can take to modify the code. We can condition plots on outcomes. We can condition the plots on demographics. I outline some specifics here.
 
 ##5.1 Conditioning on `GENDER` and Outcome
 
@@ -187,3 +189,14 @@ If we wanted to add this column to the application, where would we add this code
 
 The genes used in this dataset come from Reactome Pathways. What if we took the 836 genes (also available in `old/genes.txt`) in our set and did a GO enrichment analysis? How could we visualize these results?
 
+If you want to add another tab, you will need to add another `tabPanel` in `ui.R` and a plot in `server.R`. 
+
+#5.4 Integrate More Complex Outcomes
+
+The multi-symptom outcomes are available for each patient in the following file below. What do we need to do to merge this information in with our data?
+
+```{r}
+SymptomScores <- fread("data/ViralChallenge_training_SymptomScoresByDay.tsv")
+
+SymptomScores
+```
