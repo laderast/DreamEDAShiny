@@ -1,11 +1,11 @@
 ---
-title: "Introduction to data.table"
+title: "Introduction to `data.table`"
 author: "Ted Laderas"
 date: "July 20, 2016"
 output: html_document
 ---
 
-##6.0 (Optional) A Quick Introduction to the `data.table` package
+#1.0 A Quick Introduction to the `data.table` package
 
 We are using the `data.tables` package to store the data in memory. There are many advantages of a `data.table` versus using the regular `data.frame`:
 
@@ -26,7 +26,7 @@ Where
 
 We'll slowly go over all of these operations.
 
-##6.1 Keys For `data.table`
+##1.1 Keys For `data.table`
 
 A `data.table` has a key, which you can set by using the `setkey()` function. This key is usually a column name, though you can also use multiple columns here. This key has two purposes: it provides an *index* to sort the `data.table`, and for joining with other tables, it provides the identifier to join on. Joins/merges with data.table are very quick.
 
@@ -71,12 +71,11 @@ irisDT[testTable]
 
 You may notice that the syntax here is completely different than `data.frame`. The way to read the above merge is that we want to merge the rows of `irisDT` and `testTable` given the keys that we have specified for each table.
 
-###6.3 Casting the long data into wide data
+###1.2 Casting the long data into wide data
 
 If we wanted the data in a `wide` matrix format with each row belonging to a probeset/patient/study triplet, and each column corresponding to the value of the time series, we can transform the data using `dcast`. This function lets us *reshape* the data into another format. 
 
 The key to understanding `dcast` is understanding the formula interface for R.
-
 
 ```{r}
 load("data/twoStudies.RData")
@@ -84,7 +83,7 @@ load("data/twoStudies.RData")
 dcast(viralData, FEATUREID + SUBJECTID + STUDYID ~ TIMEHOURS, value.var= "value", fun.aggregate = mean)
 ```
 
-##6.4 Subsetting Rows
+##1.3 Subsetting Rows
 
 This operation is very fast, and is the main reason we're using `data.tables`. Let's look at the first entry in the `pathways` object.
 
@@ -97,19 +96,44 @@ path1 <- pathways[[pway]]
 path1
 ```
 
-##6.5 Subsetting Columns
+##1.4 Subsetting Columns
 
-You can subset columns the more 
+You can subset columns the `data.frame` way by using the optional `with=FALSE` argument. This is important to know if you're passing a character vector to subset the data.
 
+```{r}
+irisDT[,c("Species", "Sepal.Length"), with=FALSE]
+```
 
-##6.6 Running Operations on columns
+The `data.table` way is to pass a list of values wrapped up in `.()`, which is a shortcut for list. Also note that we don't quote the names of the columns we ask for.
 
+```{r}
+irisDT[,.(Species, Sepal.Length)]
+```
 
+##1.5 Running Operations on Columns
 
-##6.6 Using `by` to `tapply`
+Within the `j`-statement, we can run all sorts of functions. For example:
 
-Much like the `tapply()` command can be run on `data.frames` to aggregate data, we can specify operations or functions on columns (which are called `j`-statements) and use the `by=` argument to specify the operation 
+```{r}
+irisDT[,mean(Sepal.Width)]
+```
 
-##6.5 Calculating New Values on Columns
+Much like the `tapply()` command can be run on `data.frames` to aggregate data, we can specify operations or functions on columns (which are called *`j`-statements*) and use the `by=` argument to specify the operation. Here, we say that we want to aggregate the values by `Species` and produce  
+
+```{r}
+irisDT[,mean(Sepal.Width), by=Species]
+```
+
+If we want to return multiple outputs, we have to wrap our `j`-statement with the `.()` alias. Within these alias, we can also name the output columns.
+
+```{r}
+irisDT[,.(meanSW=mean(Sepal.Width), sdSW=sd(Sepal.Width)), by=Species]
+```
+
+##1.6 Calculating New Values on Columns
 
 One of the most powerful operations is of `data.table` is that you can operate on columns in place using the `:=` operator. 
+
+Obviously, this can be dangerous if you are rewriting columns, so take caution with this.
+
+##1.7 Putting it all together
